@@ -61,16 +61,20 @@
             const username = document.getElementById('username').value;
 
             const users = {
-                'alumno1': { role: 'alumno' },
-                'profesor1': { role: 'profesor' },
-                'carlos': { role: 'admin' },
-                 'mettoy': { role: 'admin' }
+                'alumno1': 'alumno',
+                'profesor1': 'profesor',
+                'carlos': 'admin',
+                'mettoy': 'admin'
             };
 
             if (users[username]) {
-                localStorage.setItem('currentUser', JSON.stringify({ username, role: users[username].role }));
+                localStorage.setItem('currentUser', JSON.stringify({ username, role: users[username] }));
                 alert('Inicio de sesión exitoso');
-                window.location.href = "index.html";
+                if (users[username] === 'alumno') {
+                    window.location.href = "alumnos.html";
+                } else {
+                    window.location.href = "2025-1.html";
+                }
             } else {
                 alert('Nombre de usuario incorrecto');
             }
@@ -78,4 +82,3 @@
     </script>
 </body>
 </html>
-
