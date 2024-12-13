@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Asistencia Shabbat - CEI MGA</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #121212;
+            color: #ffffff;
+        }
+        header {
+            background: linear-gradient(45deg, #1f1f1f, #3a3a3a);
+            color: white;
+            padding: 20px;
+            text-align: center;
+            border-bottom: 2px solid #ffcc00;
+        }
+        .container {
+            padding: 20px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        table, th, td {
+            border: 1px solid #ffffff;
+        }
+        th, td {
+            padding: 10px;
+            text-align: left;
+        }
+        th {
+            background-color: #1a73e8;
+        }
+        .status-checkbox input[type="checkbox"] {
+            margin: 0 10px;
+        }
+        .button-container {
+            text-align: right;
+        }
+        .button-container button {
+            padding: 10px 20px;
+            background-color: #1a73e8;
+            color: #ffffff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .button-container button:hover {
+            background-color: #155bb5;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Asistencia Shabbat - CEI MGA</h1>
+    </header>
+    <div class="container">
+        <div class="button-container">
+            <button onclick="guardarDatos()">Guardar</button>
+        </div>
+        <h2>Shabbat 1</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Nombre</th>
+                    <th>Teléfono</th>
+                    <th>Llegó</th>
+                    <th>No Llegó</th>
+                    <th>Justificado</th>
+                </tr>
+            </thead>
+            <tbody id="tabla-shabbat1">
+            </tbody>
+        </table>
+        <h2>Shabbat 2</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Nombre</th>
+                    <th>Teléfono</th>
+                    <th>Llegó</th>
+                    <th>No Llegó</th>
+                    <th>Justificado</th>
+                </tr>
+            </thead>
+            <tbody id="tabla-shabbat2">
+            </tbody>
+        </table>
+    </div>
+    <script>
+        function cargarDatos() {
+            const data = localStorage.getItem('tablaPersonas');
+            if (data) {
+                const personas = JSON.parse(data);
+                cargarTabla(personas, 'tabla-shabbat1');
+                cargarTabla(personas, 'tabla-shabbat2');
+            }
+
+            const asistenciaData = localStorage.getItem('asistenciaShabbat');
+            if (asistenciaData) {
+                const asistencia = JSON.parse(asistenciaData);
+                cargarAsistencia(asistencia.shabbat1, 'tabla-shabbat1');
+                cargarAsistencia(asistencia.shabbat2, 'tabla-shabbat2');
+            }
+        }
+
+        function cargarTabla(personas, tablaId) {
+            const table = document.getElementById(tablaId);
+            personas.forEach(persona => {
+                const row = table.insertRow();
+                const cell1 = row.insertCell(0);
+                const cell2 = row.insertCell(1);
+                const cell3 = row.insertCell(2);
+                const cell4 = row.insertCell(3);
+                const cell5 = row.insertCell(4);
+
+                cell1.innerHTML = persona.nombre;
+                cell2.innerHTML = persona.telefono;
+                cell3.innerHTML = `<input type="checkbox" onchange="marcarAsistencia(this, 'llego')">`;
+                cell4.innerHTML = `<input type="checkbox" onchange="marcarAsistencia(this, 'noLlego')">`;
+                cell5.innerHTML = `<input type="checkbox" onchange="marcarAsistencia(this, 'justificado')">`;
+            });
+        }
+
+        function cargarAsistencia(asistencia, tablaId) {
+            const table = document.getElementById(tablaId);
+            for (let i = 0; i < table.rows.length; i++) {
+                const row = table.rows[i];
+                const persona = asistencia[i];
+                if (persona) {
+                    row.cells[2].querySelector('input').checked = persona.llego;
+                    row.cells[3].querySelector('input').checked = persona.noLlego;
+                    row.cells[4].querySelector('input').checked = persona.justificado;
+                    marcarAsistencia(row.cells[2].querySelector('input'), 'llego');
+                    marcarAsistencia(row.cells[3].querySelector('input'), 'noLlego');
+                    marcarAsistencia(row.cells[4].querySelector('input'), 'justificado');
+                }
+            }
+        }
+
+        function marcarAsistencia(checkbox, tipo) {
+            const row = checkbox.parentElement.parentElement;
+            row.style.backgroundColor = '';
+
+            if (tipo === 'llego') {
+                if (checkbox.checked) {
+                    row.style.backgroundColor = 'green';
+                }
+                desmarcarOtros(checkbox, row, ['noLlego', 'justificado']);
+            } else if (tipo === 'noLlego') {
+                if (checkbox.checked) {
+                    row.style.backgroundColor = 'red';
+                }
+                desmarcarOtros(checkbox, row, ['llego', 'justificado']);
+            } else if (tipo === 'justificado') {
+                if (checkbox.checked) {
+                    row.style.backgroundColor = 'orange';
+                }
+                desmarcarOtros(checkbox, row, ['llego', 'noLlego']);
+            }
+        }
+
+        function desmarcarOtros(currentCheckbox, row, otrosTipos) {
+            otrosTipos.forEach(tipo => {
+                const checkbox = row.querySelector(`input[type="checkbox"][onchange*="${tipo}"]`);
+                if (checkbox && checkbox !== currentCheckbox) {
+                    checkbox.checked = false;
+                }
+            });
+        }
+
+        function guardarDatos() {
+            const datos = {};
+            guardarTabla('tabla-shabbat1', 'shabbat1', datos);
+            guardarTabla('tabla-shabbat2', 'shabbat2', datos);
+            localStorage.setItem('asistenciaShabbat', JSON.stringify(datos));
+            alert('Datos guardados correctamente');
+        }
+
+        function guardarTabla(tablaId, grupo, datos) {
+            const table = document.getElementById(tablaId);
+            datos[grupo] = [];
+            for (let i = 0; i < table.rows.length; i++) {
+                const row = table.rows[i];
+                const nombre = row.cells[0].innerText;
+                const telefono = row.cells[1].innerText;
+                const llego = row.cells[2].querySelector('input').checked;
+                const noLlego = row.cells[3].querySelector('input').checked;
+                const justificado = row.cells[4].querySelector('input').checked;
+                datos[grupo].push({ nombre, telefono, llego, noLlego, justificado });
+            }
+        }
+
+        window.onload = cargarDatos;
+    </script>
+</body>
+</html>
