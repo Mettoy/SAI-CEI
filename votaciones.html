@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema de Votaciones - CEI MGA</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #121212;
+            color: #ffffff;
+        }
+        header {
+            background: linear-gradient(45deg, #1f1f1f, #3a3a3a);
+            color: white;
+            padding: 20px;
+            text-align: center;
+            border-bottom: 2px solid #ffcc00;
+        }
+        .container {
+            padding: 20px;
+            background: linear-gradient(45deg, #1e1e1e, #2e2e2e);
+            border-radius: 10px;
+            margin-top: 20px;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        .form-group input, .form-group textarea {
+            width: 100%;
+            padding: 10px;
+            margin-top: 10px;
+            border: 1px solid #ffffff;
+            border-radius: 5px;
+            background-color: #1f1f1f;
+            color: #ffffff;
+        }
+        .form-group button {
+            padding: 10px 20px;
+            background-color: #1a73e8;
+            color: #ffffff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .form-group button:hover {
+            background-color: #155bb5;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        table, th, td {
+            border: 1px solid #ffffff;
+        }
+        th, td {
+            padding: 10px;
+            text-align: center;
+        }
+        th {
+            background-color: #1a73e8;
+        }
+        .voting-history {
+            margin-top: 20px;
+        }
+        .voting-history ul {
+            list-style-type: none;
+            padding: 0;
+        }
+        .voting-history li {
+            background-color: #1a73e8;
+            margin-bottom: 10px;
+            padding: 10px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Sistema de Votaciones - CEI MGA</h1>
+    </header>
+    <div class="container">
+        <h2>Crear Nueva Votación</h2>
+        <div class="form-group">
+            <label for="titulo">Título de la Votación:</label>
+            <input type="text" id="titulo" placeholder="Título">
+        </div>
+        <div class="form-group candidate-list">
+            <label for="candidatos">Candidatos:</label>
+            <div id="candidatos">
+                <div class="candidate">
+                    <input type="text" name="candidato" placeholder="Candidato 1">
+                    <button type="button" onclick="removeCandidate(this)">X</button>
+                </div>
+                <div class="candidate">
+                    <input type="text" name="candidato" placeholder="Candidato 2">
+                    <button type="button" onclick="removeCandidate(this)">X</button>
+                </div>
+                <div class="candidate">
+                    <input type="text" name="candidato" placeholder="Candidato 3">
+                    <button type="button" onclick="removeCandidate(this)">X</button>
+                </div>
+            </div>
+            <button type="button" onclick="addCandidate()">Agregar Candidato</button>
+        </div>
+        <button onclick="guardarVotacion()">Guardar Votación</button>
+    </div>
+    <div class="voting-history">
+        <h2>Historial de Votaciones</h2>
+        <ul id="historial-votaciones">
+        </ul>
+    </div>
+    <div class="container">
+        <h2>Resultados de Votación</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Candidato</th>
+                    <th>Fila 1</th>
+                    <th>Fila 2</th>
+                    <th>Fila 3</th>
+                    <th>Fila 4</th>
+                    <th>Fila 5</th>
+                    <th>Total</th>
+                </tr>
+            </thead>
+            <tbody id="tabla-resultados">
+            </tbody>
+        </table>
+    </div>
+    <script>
+        function addCandidate() {
+            const div = document.createElement('div');
+            div.className = 'candidate';
+            div.innerHTML = `<input type="text" name="candidato" placeholder="Nuevo Candidato">
+                             <button type="button" onclick="removeCandidate(this)">X</button>`;
+            document.getElementById('candidatos').appendChild(div);
+        }
+
+        function removeCandidate(button) {
+            button.parentElement.remove();
+        }
+
+        function guardarVotacion() {
+            const titulo = document.getElementById('titulo').value;
+            if (!titulo) {
+                alert("Por favor, ingresa un título para la votación.");
+                return;
+            }
+
+            const candidatos = Array.from(document.querySelectorAll('input[name="candidato"]'))
+                                    .map(input => input.value).filter(value => value.trim() !== "");
+
+            if (candidatos.length === 0) {
+                alert("Por favor, ingresa al menos un candidato.");
+                return;
+            }
+
+            const votaciones = JSON.parse(localStorage.getItem('votaciones')) || [];
+            votaciones.push({ titulo, candidatos, votos: {} });
+            localStorage.setItem('votaciones', JSON.stringify(votaciones));
+            actualizarHistorial();
+            limpiarFormulario();
+        }
+
+        function actualizarHistorial() {
+            const votaciones = JSON.parse(localStorage.getItem('votaciones')) || [];
+            const historial = document.getElementById('historial-votaciones');
+            historial.innerHTML = '';
+            votaciones.forEach((votacion, index) => {
+                const li = document.createElement('li');
+                li.textContent = votacion.titulo;
+                li.onclick = () => mostrarResultados(index);
+                historial.appendChild(li);
+            });
+        }
+
+        function mostrarResultados(index) {
+            const votaciones = JSON.parse(localStorage.getItem('votaciones')) || [];
+            const votacion = votaciones[index];
+            if (votacion) {
+                const resultados = votacion.votos;
+                const tablaResultados = document.getElementById('tabla-resultados');
+                tablaResultados.innerHTML = '';
+                votacion.candidatos.forEach(candidato => {
+                    const row = tablaResultados.insertRow();
+                    const cell1 = row.insertCell(0);
+                    cell1.textContent = candidato;
+
+                    for (let i = 1; i <= 5; i++) {
+                        const cell = row.insertCell(i);
+                        cell.innerHTML = `<input type="number" value="${resultados[candidato] ? resultados[candidato][i-1] : 0}" 
+                                            onchange="actualizarTotal(${index}, '${candidato}', ${i-1}, this.value)">`;
+                    }
+
+                    const totalCell = row.insertCell(6);
+                    totalCell.id = `total-${candidato}`;
+                    totalCell.textContent = resultados[candidato] ? resultados[candidato].reduce((a, b) => a + b, 0) : 0;
+                });
+            }
+        }
+
+        function actualizarTotal(index, candidato, fila, valor) {
+            const votaciones = JSON.parse(localStorage.getItem('votaciones')) || [];
+            const votacion = votaciones[index];
+
+            if (!votacion.votos[candidato]) {
+                votacion.votos[candidato] = Array(5).fill(0);
+            }
+            votacion.votos[candidato][fila] = parseInt(valor) || 0;
+
+            localStorage.setItem('votaciones', JSON.stringify(votaciones));
+            document.getElementById(`total-${candidato}`).textContent = votacion.votos[candidato].reduce((a, b) => a + b, 0);
+        }
+
+        function limpiarFormulario() {
+            document.getElementById('titulo').value = '';
+            document.getElementById('candidatos').innerHTML = '';
+            addCandidate();
+            addCandidate();
+            addCandidate();
+        }
+
+        window.onload = actualizarHistorial;
+    </script>
+</body>
+</html>
