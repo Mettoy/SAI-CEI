@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registro de Personas - CEI MGA</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #121212;
+            color: #ffffff;
+        }
+        header {
+            background: linear-gradient(45deg, #1f1f1f, #3a3a3a);
+            color: white;
+            padding: 20px;
+            text-align: center;
+            border-bottom: 2px solid #ffcc00;
+        }
+        .container {
+            padding: 20px;
+            background: linear-gradient(45deg, #1e1e1e, #2e2e2e);
+            border-radius: 10px;
+            margin-top: 20px;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        .form-group input, .form-group textarea {
+            width: 100%;
+            padding: 10px;
+            margin-top: 10px;
+            border: 1px solid #ffffff;
+            border-radius: 5px;
+            background-color: #1f1f1f;
+            color: #ffffff;
+        }
+        .form-group button {
+            padding: 10px 20px;
+            background-color: #1a73e8;
+            color: #ffffff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .form-group button:hover {
+            background-color: #155bb5;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        table, th, td {
+            border: 1px solid #ffffff;
+        }
+        th, td {
+            padding: 10px;
+            text-align: left;
+        }
+        th {
+            background-color: #1a73e8;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Registro de Personas - CEI MGA</h1>
+    </header>
+    <div class="container">
+        <h2>Agregar Persona</h2>
+        <div class="form-group">
+            <label for="nombre">Nombre:</label>
+            <input type="text" id="nombre" placeholder="Nombre">
+        </div>
+        <div class="form-group">
+            <label for="telefono">Teléfono:</label>
+            <input type="text" id="telefono" placeholder="Teléfono">
+        </div>
+        <div class="form-group">
+            <label for="aseo">Aseo:</label>
+            <input type="text" id="aseo" placeholder="Aseo">
+        </div>
+        <button onclick="agregarPersona()">Agregar Persona</button>
+    </div>
+    <table>
+        <thead>
+            <tr>
+                <th>Nombre</th>
+                <th>Teléfono</th>
+                <th>Aseo</th>
+            </tr>
+        </thead>
+        <tbody id="tabla-personas">
+        </tbody>
+    </table>
+    <script>
+        function agregarPersona() {
+            const nombre = document.getElementById('nombre').value;
+            const telefono = document.getElementById('telefono').value;
+            const aseo = document.getElementById('aseo').value;
+
+            if (!nombre || !telefono || !aseo) {
+                alert("Por favor, completa todos los campos.");
+                return;
+            }
+
+            const table = document.getElementById('tabla-personas');
+            const row = table.insertRow();
+            const cell1 = row.insertCell(0);
+            const cell2 = row.insertCell(1);
+            const cell3 = row.insertCell(2);
+
+            cell1.innerHTML = nombre;
+            cell2.innerHTML = telefono;
+            cell3.innerHTML = aseo;
+
+            guardarDatos();
+            limpiarFormulario();
+        }
+
+        function guardarDatos() {
+            const table = document.getElementById('tabla-personas');
+            const data = [];
+            for (let i = 0; i < table.rows.length; i++) {
+                const row = table.rows[i];
+                const rowData = {
+                    nombre: row.cells[0].innerHTML,
+                    telefono: row.cells[1].innerHTML,
+                    aseo: row.cells[2].innerHTML
+                };
+                data.push(rowData);
+            }
+            localStorage.setItem('tablaPersonas', JSON.stringify(data));
+        }
+
+        function cargarDatos() {
+            const data = localStorage.getItem('tablaPersonas');
+            if (data) {
+                const table = document.getElementById('tabla-personas');
+                const rows = JSON.parse(data);
+                rows.forEach(rowData => {
+                    const row = table.insertRow();
+                    row.insertCell(0).innerHTML = rowData.nombre;
+                    row.insertCell(1).innerHTML = rowData.telefono;
+                    row.insertCell(2).innerHTML = rowData.aseo;
+                });
+            }
+        }
+
+        function limpiarFormulario() {
+            document.getElementById('nombre').value = '';
+            document.getElementById('telefono').value = '';
+            document.getElementById('aseo').value = '';
+        }
+
+        window.onload = cargarDatos;
+    </script>
+</body>
+</html>
