@@ -26,7 +26,7 @@
         .login-container h1 {
             color: #ffcc00;
         }
-        .login-container input[type="text"] {
+        .login-container input[type="text"], .login-container input[type="password"] {
             padding: 10px;
             margin: 10px 0;
             width: 100%;
@@ -50,10 +50,32 @@
 <body>
     <div class="login-container">
         <h1>Inicio de Sesión - CEI MGA</h1>
-        <form action="2025-1.html" method="GET">
-            <input type="text" name="mettoyj" placeholder="Nombre de usuario" required>
+        <form id="login-form">
+            <input type="text" id="username" placeholder="Nombre de usuario" required>
+            <input type="password" id="password" placeholder="Contraseña" required>
             <input type="submit" value="Iniciar Sesión">
         </form>
     </div>
+    <script>
+        document.getElementById('login-form').addEventListener('submit', function(event) {
+            event.preventDefault();
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+
+            const users = {
+                'alumno1': { role: 'alumno', password: 'pass123' },
+                'profesor1': { role: 'profesor', password: 'prof123' },
+                'carlos': { role: 'admin', password: 'carlos123' }
+            };
+
+            if (users[username] && users[username].password === password) {
+                localStorage.setItem('currentUser', JSON.stringify({ username, role: users[username].role }));
+                alert('Inicio de sesión exitoso');
+                window.location.href = "index.html";
+            } else {
+                alert('Nombre de usuario o contraseña incorrectos');
+            }
+        });
+    </script>
 </body>
 </html>
