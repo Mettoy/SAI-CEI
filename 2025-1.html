@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Página Principal - CEI MGA</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #121212;
+            color: #ffffff;
+        }
+        header {
+            background: linear-gradient(45deg, #1f1f1f, #3a3a3a);
+            color: white;
+            padding: 20px;
+            text-align: center;
+            border-bottom: 2px solid #ffcc00;
+        }
+        nav {
+            display: flex;
+            justify-content: center;
+            background-color: #1a73e8;
+        }
+        nav ul {
+            list-style-type: none;
+            padding: 0;
+            margin: 0;
+            display: flex;
+        }
+        nav ul li {
+            position: relative;
+            margin: 0 15px;
+        }
+        nav ul li a {
+            color: white;
+            text-decoration: none;
+            padding: 15px 20px;
+            display: block;
+        }
+        nav ul li ul {
+            display: none;
+            position: absolute;
+            top: 100%;
+            left: 0;
+            background-color: #1a73e8;
+            padding: 0;
+            list-style: none;
+            margin: 0;
+            border-radius: 0 0 10px 10px;
+        }
+        nav ul li:hover ul {
+            display: block;
+        }
+        nav ul li ul li {
+            width: 200px;
+        }
+        nav ul li ul li a {
+            padding: 10px;
+        }
+        .container {
+            padding: 20px;
+        }
+        section {
+            margin-bottom: 20px;
+            padding: 20px;
+            background: linear-gradient(45deg, #1e1e1e, #2e2e2e);
+            border-radius: 10px;
+        }
+        h2 {
+            color: #ffcc00;
+        }
+        footer {
+            background: linear-gradient(45deg, #1f1f1f, #3a3a3a);
+            color: white;
+            text-align: center;
+            padding: 10px;
+            border-top: 2px solid #ffcc00;
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+        }
+        .calendar, .countdown {
+            margin-top: 20px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Colegio CEI MGA</h1>
+    </header>
+    <nav>
+        <ul>
+            <li><a href="index.html">Inicio</a></li>
+            <li><a href="#">Menú</a>
+                <ul>
+                    <li><a href="estudiantes.html">Estudiantes</a></li>
+                    <li><a href="asistencia-shabatts.html">Asistencia Shabatts</a></li>
+                    <li><a href="votaciones.html">VOTACIONES</a></li>
+                    <li><a href="asistencia-aseo.html">Asistencia de Aseo</a></li>
+                </ul>
+            </li>
+        </ul>
+    </nav>
+    <div class="container">
+        <section id="inicio">
+            <h2>Bienvenidos</h2>
+            <p>Bienvenidos al Colegio CEI MGA, donde la educación de calidad y el futuro se encuentran. Nos enorgullece ofrecer un entorno de aprendizaje innovador y enriquecedor para todos nuestros estudiantes.</p>
+        </section>
+        <section class="countdown">
+            <h2>Cuenta Regresiva</h2>
+            <div id="countdown-display"></div>
+            <input type="datetime-local" id="countdown-input">
+            <button onclick="setCountdown()">Establecer Cuenta Regresiva</button>
+        </section>
+        <section class="calendar">
+            <h2>Calendario de Actividades</h2>
+            <iframe src="https://calendar.google.com/calendar/embed?src=tu_calendario_google_id&ctz=America/Managua" style="border: 0" width="800" height="600" frameborder="0" scrolling="no"></iframe>
+        </section>
+    </div>
+    <footer>
+        <p>&copy; 2024 Colegio CEI MGA. Todos los derechos reservados.</p>
+    </footer>
+    <script>
+        function setCountdown() {
+            const countdownDate = new Date(document.getElementById('countdown-input').value).getTime();
+            localStorage.setItem('countdownDate', countdownDate);
+            updateCountdown();
+        }
+
+        function updateCountdown() {
+            const countdownDate = localStorage.getItem('countdownDate');
+            if (!countdownDate) return;
+
+            const now = new Date().getTime();
+            const distance = countdownDate - now;
+
+            if (distance < 0) {
+                document.getElementById('countdown-display').innerHTML = "Cuenta regresiva finalizada";
+                return;
+            }
+
+            const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+            const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+            const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+            document.getElementById('countdown-display').innerHTML = days + "d " + hours + "h "
+                + minutes + "m " + seconds + "s ";
+
+            setTimeout(updateCountdown, 1000);
+        }
+
+        updateCountdown();
+    </script>
+</body>
+</html>
