@@ -87,11 +87,8 @@
     </header>
     <nav>
         <ul>
-            <li><a href="index.html">Inicio</a></li>
-            <li><a href="estudiantes.html">Estudiantes</a></li>
-            <li><a href="asistencia-shabbat.html">Asistencia Shabbat</a></li>
-            <li><a href="trabajos-importantes.html">Trabajos Importantes</a></li>
-            <li id="aseo-link"><a href="asistencia-aseo.html">Asistencia de Aseo</a></li>
+            <li><a href="2025.html">2025</a></li>
+            <li><a href="2026.html">2026</a></li>
         </ul>
     </nav>
     <div class="hero">
@@ -118,9 +115,7 @@
                 alert('Por favor, inicia sesión primero');
                 window.location.href = "2025.html";
             } else {
-                if (currentUser.role === 'alumno') {
-                    document.getElementById('aseo-link').style.display = 'none';
-                }
+                // No se requiere ocultar enlaces específicos ya que solo hay "2025" y "2026"
             }
         }
     </script>
